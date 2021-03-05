@@ -7,27 +7,28 @@ on:
     paths:
     - '**.py'
 jobs:
+  checker:
   autoyapf:
     runs-on: ubuntu-latest
-    steps:
-      if: github.event_name == 'pull_request' && github.event.pull_request.merged == true || github.event_name == 'push'
-      - uses: actions/checkout@master
-        with:
-          ref: ${{ github.head_ref }}
-      - name: autoyapf
-        id: autoyapf
-        uses: mritunjaysharma394/autoyapf@v2
-        with:
-          args: --style pep8 --recursive --in-place .
-      - name: Check for modified files
-        id: git-check
-        run: echo ::set-output name=modified::$(if git diff-index --quiet HEAD --; then echo "false"; else echo "true"; fi)
-      - name: Push changes
-        if: steps.git-check.outputs.modified == 'true'
-        run: |
-          git config --global user.name 'David Muñoz' 
-          git config --global user.email '43390350+davidmubernal@users.noreply.github.com'
-          name="$(git show -s --format=%B)"
-          git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
-          git commit -am "$name - Automated PEP 8 check"
-          git push
+    if: github.event_name == 'pull_request' && github.event.pull_request.merged == true || github.event_name == 'push'
+      steps:
+        - uses: actions/checkout@master
+          with:
+            ref: ${{ github.head_ref }}
+        - name: autoyapf
+          id: autoyapf
+          uses: mritunjaysharma394/autoyapf@v2
+          with:
+            args: --style pep8 --recursive --in-place .
+        - name: Check for modified files
+          id: git-check
+          run: echo ::set-output name=modified::$(if git diff-index --quiet HEAD --; then echo "false"; else echo "true"; fi)
+        - name: Push changes
+          if: steps.git-check.outputs.modified == 'true'
+          run: |
+            git config --global user.name 'David Muñoz' 
+            git config --global user.email '43390350+davidmubernal@users.noreply.github.com'
+            name="$(git show -s --format=%B)"
+            git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
+            git commit -am "$name - Automated PEP 8 check"
+            git push
