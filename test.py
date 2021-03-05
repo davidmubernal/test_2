@@ -1,5 +1,4 @@
 # Documento de pruebas
 
-
-print ('hello')
-print ('hola')
+print('hello')
+print('hola')
